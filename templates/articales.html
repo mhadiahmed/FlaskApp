@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Articale
+{% endblock title %}
+
+{% block content %}
+	<h1>Articales</h1>
+	<ul class="list-group">
+	{% for articale in Articales %}
+		<li class="list-group-item">
+			<a href="/artical/{{articale.id}}">{{articale.title}}</a>
+		</li>
+	{% endfor %}	
+	</ul>
+
+{% endblock content %}
