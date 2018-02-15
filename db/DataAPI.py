@@ -22,3 +22,20 @@ def add_user(name,username,email,password):
 	conn.commit()
 	# close connection
 	db.close()
+
+
+
+def check_user(username):
+	c_username = clean(username)
+	# connection to database
+	conn,db = connection()
+
+	# execute query
+
+	query = db.execute('SELECT * FROM users WHERE username = %s',[c_username])
+
+	#fetch data
+
+	data = db.fetchone()
+
+	return query,data

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Login
+{% endblock title %}
+
+{% block content %}
+	<div class="container col-4 text-center">
+		<h1 class="h1 mb-1 font-weight-normal text-lg-center">Login</h1>
+		{% from "includes/_formhelper.html" import render_field %}
+		<form action="" method="post">
+	      <label for="inputEmail" class="sr-only">User name</label>
+	      <input type="text" name="username" class="form-control" placeholder="User Name" required autofocus value="{{request.form.username}}">
+	      <label for="inputPassword" class="sr-only">Password</label>
+	      <input type="password" name="password" class="form-control" placeholder="Password" required value="{{request.form.password}}">
+	      <br>
+	      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+	      <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+		</form>
+	</div>
+{% endblock content %}

@@ -9,9 +9,13 @@
 		<p class="lead">
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Id quo, rerum ipsa saepe minima molestiae aspernatur animi et ipsum numquam incidunt, similique natus praesentium recusandae? Et deleniti, sed odio mollitia!
 		</p>
+			{% if session.logged_in %}
+				
+			{% else %}
 		<span>
-			<a href="#" class="btn btn-primary">Rigester</a>
-			<a href="#" class="btn btn-success">Login</a>
+			<a href="/register" class="btn btn-primary">Rigester</a>
+			<a href="/login" class="btn btn-success">Login</a>
+			{% endif %}
 		</span>
 	</div>
 {% endblock content %}

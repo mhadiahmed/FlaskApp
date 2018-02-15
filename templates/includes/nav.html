@@ -17,9 +17,18 @@
       </li>
     </ul>
     <ul class="navbar-nav navbar-right">
+      {% if session.logged_in %}
+        <li class="nav-item active">
+        <a href="/logout" class="nav-link">Logout</a>
+      </li>
+      {% else %}
       <li class="nav-item active">
         <a href="/register" class="nav-link">Rigester</a>
+      </li>      
+       <li class="nav-item active">
+        <a href="/login" class="nav-link">Login</a>
       </li> 
+      {% endif %}
     </ul>
     <form class="form-inline mt-2 mt-md-0">
       <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
