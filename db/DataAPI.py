@@ -27,7 +27,7 @@ def add_user(name,username,email,password):
 
 def check_user(username):
 	c_username = clean(username)
-	# connection to database
+	# create connection
 	conn,db = connection()
 
 	# execute query
@@ -39,3 +39,48 @@ def check_user(username):
 	data = db.fetchone()
 
 	return query,data
+
+def Add_Articale(title,user,content):
+	c_title = clean(title)
+	c_content = clean(content)
+
+	conn,db = connection()
+
+	query = db.execute('INSERT INTO articale (title,author,content,approve) VALUES (%s,%s,%s,0)',(c_title,user,c_content))
+
+	conn.commit()
+
+	db.close()
+
+def show_articale():
+	conn,db = connection()
+
+	query = db.execute('SELECT * FROM articale WHERE approve=0 ORDER BY id DESC')
+
+	data = db.fetchall()
+
+	return query,data
+
+
+def get_by_id(id):
+	c_id = clean(id)
+	conn,db = connection()
+
+	query = db.execute('SELECT * FROM articale WHERE id=%s',[c_id])
+
+	data = db.fetchone()
+
+	return query,data
+
+
+def update(id,title,content):
+	c_id = clean(id)
+	c_title = clean(title)
+	c_content = clean(content)
+	conn,db = connection()
+
+	query = db.execute('UPDATE articale SET title=%s, content = %s WHERE id = %s',(c_title,c_content,c_id))
+
+	conn.commit()
+
+	db.close

@@ -9,3 +9,7 @@ class RigesterForm(Form):
 		validators.EqualTo('confirm', message='Passwords must match')
 	])
 	confirm = PasswordField('Repeat Password')
+
+class Add_Articale_form(Form):
+	title = StringField('Title',[validators.Length(min=5,max=25)])
+	content = TextAreaField('Content',[validators.Length(min=30)])

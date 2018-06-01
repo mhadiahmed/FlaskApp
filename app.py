@@ -1,12 +1,19 @@
 from flask import Flask,render_template,request,session,url_for,redirect,logging,flash
 from DB import Articale
-from forms import RigesterForm
+from forms import RigesterForm,Add_Articale_form
 from db.DataBase import connection
-from db.DataAPI import add_user,check_user
+from db.DataAPI import (
+	add_user,
+	check_user,
+	Add_Articale,
+	show_articale,
+	get_by_id,
+	update
+)
 from passlib.hash import sha256_crypt
 
 
-Articales = Articale()
+# Articales = Articale()
 
 app = Flask(__name__)
 
@@ -27,12 +34,53 @@ def about():
 
 @app.route('/articale')
 def Areticales():
-	return render_template("articales.html",Articales=Articales)
+	query,data = show_articale()
 
+	if query > 0:
+		Articales = data
+		return render_template("articales.html",Articales=Articales)
+	else:
+		msg = "no data yet .."
+		return render_template("articales.html",msg=msg)
+
+
+@app.route('/create',methods=['GET','POST'])
+def Articale_create():
+	form  = Add_Articale_form(request.form)
+	if request.method == "POST" and form.validate():
+		title = form.title.data 
+		content = form.content.data 
+		user = session['username']
+		Add_Articale(title,user,content)
+		flash("Articale is saved..","success")
+		return redirect(url_for('Areticales'))
+	return render_template('create_articale.html',form=form)
+
+@app.route('/edit/<string:id>',methods=['GET','POST'])
+def Articale_edit(id):
+	form  = Add_Articale_form(request.form)
+	query ,data = get_by_id(id)
+	form.title.data = data['title']
+	form.content.data = data['content']
+
+	if request.method == "POST" and form.validate():
+		title = request.form['title']
+		content = request.form['content']
+		update(id,title,content)
+		flash("Articale is updated..","success")
+		return redirect(url_for('Areticales'))
+	return render_template('create_articale.html',form=form)
 
 @app.route('/artical/<string:id>')
 def Areticale_deatil(id):
-	return render_template("articale_deatil.html",id=id)
+	query ,data = get_by_id(id)
+	if query > 0:
+		artd = data
+		return render_template("articale_deatil.html",artd=artd)
+	else:
+		msg = "no articale with this id."
+		return render_template("articale_deatil.html",msg=msg)
+	
 
 
 @app.route('/register',methods=['GET','POST'])
@@ -82,10 +130,9 @@ def login():
 @app.route('/logout',methods=['GET','POST'])
 def logout():
 	session.clear()
-	flash("See you Later soon..","warning")
+	flash("See you Later soon..","info")
 	return redirect(url_for("login"))
 
 if __name__ == "__main__":
 	app.secret_key = "@%^&(*9867ahsh"
 	app.run(debug=True)
-        

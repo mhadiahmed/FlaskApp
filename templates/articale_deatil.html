@@ -5,6 +5,14 @@
 {% endblock title %}
 
 {% block content %}
-	<h1>{{id}}</h1>
+{% if artd %}
+	{% if session.username == artd.author %}
+		<a href="{{url_for('Articale_edit',id=artd.id)}}" class="btn btn-link">Edit</a>
+	{% endif %}
+	<h1>{{artd.title}}</h1>
+	<span>write by : {{artd.author}} on {{artd.created}}</span>
+	<p>{{artd.content}}</p>
+{% endif %}
+
 
 {% endblock content %}

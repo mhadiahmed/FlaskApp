@@ -6,6 +6,9 @@
 
 {% block content %}
 	<h1>Articales</h1>
+	<a href="{{url_for('Articale_create')}}" class="btn btn-primary btn-lg">New Articale</a>
+	<br>
+	<br>
 	<ul class="list-group">
 	{% for articale in Articales %}
 		<li class="list-group-item">

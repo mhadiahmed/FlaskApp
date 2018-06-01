@@ -5,6 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
+DB.py
+amd.py
 bootstrap-4.0.0-dist.zip
 # Distribution / packaging
 .Python

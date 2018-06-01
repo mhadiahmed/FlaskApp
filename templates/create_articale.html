@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Create Articale
+{% endblock title %}
+
+{% block content %}
+	<div class="container col-8">
+		<h1 class="h1 mb-1 font-weight-normal text-lg-center">Publish New Articale</h1>
+		{% from "includes/_formhelper.html" import render_field %}
+		<form action="" method="post">
+			<div class="form-group">
+				{{render_field(form.title,class="form-control")}}
+			</div>
+			<div class="form-group">
+				{{render_field(form.content,class="form-control")}}
+			</div>
+			<button type="submit" class="btn btn-primary">Create</button>
+		</form>
+	</div>
+{% endblock content %}
