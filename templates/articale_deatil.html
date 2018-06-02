@@ -8,6 +8,7 @@
 {% if artd %}
 	{% if session.username == artd.author %}
 		<a href="{{url_for('Articale_edit',id=artd.id)}}" class="btn btn-link">Edit</a>
+		<a href="{{url_for('Areticale_delete',id=artd.id)}}" class="btn btn-danger">Delete</a>
 	{% endif %}
 	<h1>{{artd.title}}</h1>
 	<span>write by : {{artd.author}} on {{artd.created}}</span>

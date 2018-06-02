@@ -8,17 +8,42 @@ from db.DataAPI import (
 	Add_Articale,
 	show_articale,
 	get_by_id,
-	update
+	update,
+	delete
 )
 from passlib.hash import sha256_crypt
-
+from functools import wraps
 
 # Articales = Articale()
 
 app = Flask(__name__)
 
+#**************************************************
+# Permissions
+#**************************************************
+def is_admin(f):
+	@wraps(f)
+	def wrap(*args,**kwargs):
+		if 'is_admin' in session:
+			return f(*args,**kwargs)
+		else:
+			return redirect(url_for('home'))
+	return wrap
 
 
+
+#**************************************************
+#Dashboard Pages
+#**************************************************
+@app.route('/dashboard')
+@is_admin
+def dashboard():
+	return render_template('dashboard.html')
+
+
+#**************************************************
+#Home Pages
+#**************************************************
 @app.route('/')
 def home():
 	projectName = "FlaskApp"
@@ -32,6 +57,11 @@ def about():
 
 
 
+
+#**************************************************
+#Articales Pages
+# create , edit, deatil , delete
+#**************************************************
 @app.route('/articale')
 def Areticales():
 	query,data = show_articale()
@@ -46,6 +76,7 @@ def Areticales():
 
 @app.route('/create',methods=['GET','POST'])
 def Articale_create():
+	btnName = "Create"
 	form  = Add_Articale_form(request.form)
 	if request.method == "POST" and form.validate():
 		title = form.title.data 
@@ -54,10 +85,12 @@ def Articale_create():
 		Add_Articale(title,user,content)
 		flash("Articale is saved..","success")
 		return redirect(url_for('Areticales'))
-	return render_template('create_articale.html',form=form)
+	return render_template('create_articale.html',form=form,btnName=btnName)
+
 
 @app.route('/edit/<string:id>',methods=['GET','POST'])
 def Articale_edit(id):
+	btnName = "Edit"
 	form  = Add_Articale_form(request.form)
 	query ,data = get_by_id(id)
 	form.title.data = data['title']
@@ -69,7 +102,8 @@ def Articale_edit(id):
 		update(id,title,content)
 		flash("Articale is updated..","success")
 		return redirect(url_for('Areticales'))
-	return render_template('create_articale.html',form=form)
+	return render_template('create_articale.html',form=form,btnName=btnName)
+
 
 @app.route('/artical/<string:id>')
 def Areticale_deatil(id):
@@ -82,6 +116,25 @@ def Areticale_deatil(id):
 		return render_template("articale_deatil.html",msg=msg)
 	
 
+@app.route('/delete/<string:id>')
+def Areticale_delete(id):
+	query,data = get_by_id(id)
+	username = session['username']
+	if data['author'] in username:
+		delete(id,username)
+		flash("Articale is deleted..","success")
+		return redirect(url_for('Areticales'))
+	else:
+		flash("You don't have permission to do this..","info")
+		return redirect(url_for('Areticales'))
+
+
+
+
+#**************************************************
+#Users Page
+#	Register , Login , logout
+#**************************************************
 
 @app.route('/register',methods=['GET','POST'])
 def Register():		
@@ -116,6 +169,10 @@ def login():
 			if sha256_crypt.verify(password,_password):
 				session['username'] = username
 				session['logged_in'] = True
+				admin = data['admin']
+				if admin == 1:
+					session['is_admin'] = True
+
 				flash("Welcome {}".format(username),"success")
 				return redirect(url_for('home'))
 			else:
@@ -133,6 +190,12 @@ def logout():
 	flash("See you Later soon..","info")
 	return redirect(url_for("login"))
 
+
+
+
+#**************************************************
+#Run the server in local
+#**************************************************
 if __name__ == "__main__":
 	app.secret_key = "@%^&(*9867ahsh"
 	app.run(debug=True)

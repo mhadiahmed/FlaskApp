@@ -84,3 +84,15 @@ def update(id,title,content):
 	conn.commit()
 
 	db.close
+
+
+def delete(id,username):
+	c_id = clean(id)
+	c_username = clean(username)
+	conn,db = connection()
+
+	query = db.execute('DELETE FROM articale WHERE id = %s AND author = %s',(c_id,c_username))
+
+	conn.commit()
+
+	db.close
