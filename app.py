@@ -38,7 +38,12 @@ def is_admin(f):
 @app.route('/dashboard')
 @is_admin
 def dashboard():
-	return render_template('dashboard.html')
+	ali = {
+	'naser':'naser',
+	'al':'mhadi'
+	}
+
+	return render_template('dashboard.html',ali=ali)
 
 
 #**************************************************
