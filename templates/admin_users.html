@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Users
+{% endblock title %}
+
+{% block content %}
+	<a href="{{url_for('Register')}}" class="btn btn-primary btn-lg">New User</a>
+	<br>
+	<br>
+
+	<table class="table">
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>User Name</th>
+			<th>Email</th>
+			<th></th>
+		</tr>
+
+		
+		{% for user in users %}
+			<tr>
+				<td>{{user.id}}</td>
+				<td>{{user.name}}</td>
+				<td>{{user.username}}</td>
+				<td>{{user.email}}</td>
+				<td>
+					<a href="{{url_for('admin_edit_users',id=user.id)}}" class="btn btn-success">Edit</a>
+					<a href="{{url_for('delete_users',id=user.id)}}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{user.name}} ?')">Delete</a>
+				</td>
+			</tr>
+		{% endfor %}
+		
+	</table>
+
+{% endblock content %}

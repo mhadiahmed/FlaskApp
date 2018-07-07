@@ -1,18 +1,17 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Test
+	Dashboard
 {% endblock title %}
 
 {% block content %}
-	<h1>Welcome to Dhash Board</h1>
 	<section class="row text-center">
 		<div class="col-6 col-sm-3">
 			<span class="fa fa-stack" style="font-size: 52pt;color:#0071eb">
 				<i class="fa fa-circle fa-stack-2x"></i>
 				<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
 			</span>
-			<h4><a href="#">Articales</a></h4>
+			<h4><a href="{{url_for('admin_Areticales')}}">Articales</a></h4>
 			<span>there is <strong>15</strong> articales in your web site.</span>
 		</div>
 
@@ -21,7 +20,7 @@
 				<i class="fa fa-circle fa-stack-2x"></i>
 				<i class="fa fa-users fa-stack-1x fa-inverse"></i>
 			</span>
-			<h4><a href="#">Users</a></h4>
+			<h4><a href="{{url_for('admin_users')}}">Users</a></h4>
 			<span>there is <strong>15</strong> users in your web site.</span>
 		</div>
 
@@ -30,8 +29,36 @@
 				<i class="fa fa-circle fa-stack-2x"></i>
 				<i class="fa fa-check fa-stack-1x fa-inverse"></i>
 			</span>
-			<h4><a href="#">Approve</a></h4>
+			<h4><a href="{{url_for('admin_unapproved_Areticales')}}">Approve</a></h4>
 			<span>there is <strong>15</strong> articales need your approve.</span>
+		</div>
+	</section>
+	<hr>
+	<section class="row">
+		<div class="list-group col-4">
+			<h3> <i class="fa fa-users" style="color:green"></i> Latest users</h3>
+			{% for user in latest_users %}
+				<div class="list-group-item">
+					{{user.name}} <a href="{{url_for('admin_edit_users',id=user.id)}}" class="btn btn-success btn-sm float-right">Edit</a>
+				</div>
+			{% else %}
+				<div class="list-group-item">
+					There is No Latest Users
+				</div>
+			{% endfor %}
+		</div>
+
+		<div class="list-group col-4">
+			<h3><i class="fa fa-pencil" style="color:green"></i> Latest articale</h3>
+			{% for articale in latest_articale %}
+				<div class="list-group-item">
+					{{articale.title}} <a href="{{url_for('admin_Areticale_approve',id=articale.id)}}" class="btn btn-success btn-sm float-right">Approve</a>
+				</div>
+			{% else %}
+				<div class="list-group-item">
+					There is No Latest Articale
+				</div>
+			{% endfor %}
 		</div>
 	</section>
 {% endblock content %}

@@ -24,13 +24,18 @@
         <li class="nav-item active">
         <a href="/logout" class="nav-link">Logout</a>
       </li>
+      {% if session.is_admin %}
+       <li class="nav-item active">
+        <a href="/dashboard" class="nav-link">dashboard</a>
+      </li>       {% endif %}
+
       {% else %}
       <li class="nav-item active">
         <a href="/register" class="nav-link">Rigester</a>
       </li>      
        <li class="nav-item active">
         <a href="/login" class="nav-link">Login</a>
-      </li> 
+      </li>
       {% endif %}
     </ul>
     <form class="form-inline mt-2 mt-md-0">

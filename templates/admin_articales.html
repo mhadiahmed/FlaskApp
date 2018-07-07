@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Articale
+{% endblock title %}
+
+{% block content %}
+	<h1>Articales</h1>
+	<a href="{{url_for('Articale_create')}}" class="btn btn-primary btn-lg">New Articale</a>
+	<br>
+	<br>
+
+	<table class="table">
+		<tr>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Author</th>
+			<th>Date</th>
+			<th></th>
+		</tr>
+
+		
+			{% for articale in Articales %}
+			<tr>
+				<td>{{articale.id}}</td>
+				<td>{{articale.title}}</td>
+				<td>{{articale.author}}</td>
+				<td>{{articale.created}}</td>
+				<td>
+					<a href="{{url_for('admin_Articale_edit',id=articale.id)}}" class="btn btn-success">Edit</a>
+					<a href="{{url_for('admin_Areticale_delete',id=articale.id)}}" class="btn btn-danger">Delete</a>
+				</td>
+			</tr>
+			{% endfor %}
+		
+	</table>
+
+{% endblock content %}

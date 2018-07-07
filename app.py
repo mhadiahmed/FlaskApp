@@ -1,15 +1,24 @@
 from flask import Flask,render_template,request,session,url_for,redirect,logging,flash
 from DB import Articale
-from forms import RigesterForm,Add_Articale_form
+from forms import RigesterForm,Add_Articale_form,Edit_Users
 from db.DataBase import connection
 from db.DataAPI import (
 	add_user,
 	check_user,
 	Add_Articale,
 	show_articale,
+	show_unapproved_articale,
 	get_by_id,
 	update,
-	delete
+	delete,
+	admin_delete,
+	approve,
+	show_users,
+	get_usersby_id,
+	update_user,
+	delete_user,
+	get_latest_articale,
+	get_latest_users
 )
 from passlib.hash import sha256_crypt
 from functools import wraps
@@ -21,6 +30,9 @@ app = Flask(__name__)
 #**************************************************
 # Permissions
 #**************************************************
+## *******
+# check if the user is admin in or not
+# *******
 def is_admin(f):
 	@wraps(f)
 	def wrap(*args,**kwargs):
@@ -30,7 +42,17 @@ def is_admin(f):
 			return redirect(url_for('home'))
 	return wrap
 
-
+# *******
+# check if the user is logged in or not
+# *******
+def is_logging(f):
+	@wraps(f)
+	def wrap(*args,**kwargs):
+		if 'logged_in' in session:
+			return f(*args,**kwargs)
+		else:
+			return redirect(url_for('login'))
+	return wrap
 
 #**************************************************
 #Dashboard Pages
@@ -38,13 +60,126 @@ def is_admin(f):
 @app.route('/dashboard')
 @is_admin
 def dashboard():
-	ali = {
-	'naser':'naser',
-	'al':'mhadi'
-	}
+	query,latest_users = get_latest_users()
+	query2, latest_articale = get_latest_articale()
+	return render_template('dashboard.html',latest_users=latest_users,latest_articale=latest_articale)
 
-	return render_template('dashboard.html',ali=ali)
 
+# *******
+# articales part in dashboard code
+# *******
+@app.route('/admin_articale')
+@is_admin
+def admin_Areticales():
+	query,data = show_articale()
+
+	if query > 0:
+		Articales = data
+		return render_template("admin_articales.html",Articales=Articales)
+	else:
+		msg = "no data yet .."
+		return render_template("admin_articales.html",msg=msg)
+
+
+@app.route('/admin_unapproved_articale')
+@is_admin
+def admin_unapproved_Areticales():
+	query,data = show_unapproved_articale()
+
+	if query > 0:
+		Articales = data
+		return render_template("admin_unapproved.html",Articales=Articales)
+	else:
+		msg = "no data yet .."
+		return render_template("admin_unapproved.html",msg=msg)
+
+
+@app.route('/admin_edit/<string:id>',methods=['GET','POST'])
+@is_admin
+def admin_Articale_edit(id):
+	btnName = "Edit"
+	form  = Add_Articale_form(request.form)
+	query ,data = get_by_id(id)
+	form.title.data = data['title']
+	form.content.data = data['content']
+
+	if request.method == "POST" and form.validate():
+		title = request.form['title']
+		content = request.form['content']
+		update(id,title,content)
+		flash("Articale is updated..","success")
+		return redirect(url_for('dashboard'))
+	return render_template('create_articale.html',form=form,btnName=btnName)
+
+
+@app.route('/admin_delete/<string:id>')
+@is_admin
+def admin_Areticale_delete(id):
+	query,data = get_by_id(id)
+	if 'is_admin' in session:
+		admin_delete(id)
+		flash("Articale is deleted..","success")
+		return redirect(url_for('dashboard'))
+	else:
+		flash("You don't have permission to do this..","info")
+		return redirect(url_for('dashboard'))
+
+
+@app.route('/admin_approve/<string:id>')
+@is_admin
+def admin_Areticale_approve(id):
+	if 'is_admin' in session:
+		approve(id)
+		flash("Your articales is approved.","success")
+		return redirect(url_for('admin_unapproved_Areticales'))
+
+
+# *******
+# users part in dashboard code
+# *******
+@app.route('/admin_users')
+@is_admin
+def admin_users():
+	query,data = show_users()
+
+	if query > 0:
+		users = data
+		return render_template("admin_users.html",users=users)
+	else:
+		msg = "no data yet .."
+		return render_template("admin_users.html",msg=msg)
+
+
+@app.route('/admin_edit_users/<string:id>',methods=['GET','POST'])
+@is_admin
+def admin_edit_users(id):		
+	form = Edit_Users(request.form)
+
+	query,data = get_usersby_id(id)
+
+	form.name.data = data['name']
+	form.username.data = data['username']
+	form.email.data = data['email']
+
+	if request.method == "POST" and form.validate():
+		# get data from the form
+		name = request.form['name']
+		username = request.form['username']
+		email = request.form['email']
+		# save in data base
+		update_user(name,username,email,id)
+		flash("user is updated","success")
+		return redirect(url_for("admin_users"))
+	return render_template("edit_users.html",form=form)
+
+
+
+@app.route('/delete_user/<string:id>')
+@is_admin
+def delete_users(id):
+	delete_user(id)
+	flash("User is deleted..","success")
+	return redirect(url_for('admin_users'))
 
 #**************************************************
 #Home Pages
@@ -80,6 +215,7 @@ def Areticales():
 
 
 @app.route('/create',methods=['GET','POST'])
+@is_logging
 def Articale_create():
 	btnName = "Create"
 	form  = Add_Articale_form(request.form)
@@ -94,6 +230,7 @@ def Articale_create():
 
 
 @app.route('/edit/<string:id>',methods=['GET','POST'])
+@is_logging
 def Articale_edit(id):
 	btnName = "Edit"
 	form  = Add_Articale_form(request.form)
@@ -122,6 +259,7 @@ def Areticale_deatil(id):
 	
 
 @app.route('/delete/<string:id>')
+@is_logging
 def Areticale_delete(id):
 	query,data = get_by_id(id)
 	username = session['username']
@@ -137,7 +275,7 @@ def Areticale_delete(id):
 
 
 #**************************************************
-#Users Page
+#   Users Page
 #	Register , Login , logout
 #**************************************************
 
